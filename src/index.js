@@ -46,16 +46,31 @@ app.listen(config.port, () => {
 bot.onText(/\/login (.+)/, async (msg, match) => {
   const pinboardToken = match[1];
   let pinboardUser = null;
+
+  const currentUser = await userFacade.findOne({ chatId: msg.chat.id });
+  if (currentUser.pinboardToken) {
+    bot.sendMessage(
+      msg.chat.id,
+      "You're already logged in dummy. You can logout if you want 🍑"
+    );
+    return;
+  }
+
   try {
     pinboardUser = await axios.get(
       config.pinboard.url + "/user/api_token/?auth_token=" + pinboardToken
     );
   } catch (err) {
     bot.sendMessage(msg.chat.id, "Your token is fucked up");
-    bot.sendMessage(msg.chat.id, "Usage: /login <pinboard token>");
+    bot.sendMessage(msg.chat.id, "Usage: `/login <pinboard token>`", {
+      parse_mode: "Markdown"
+    });
     bot.sendMessage(
       msg.chat.id,
-      "Get your token [here](https://pinboard.in/settings/password)"
+      "Get your token [here](https://pinboard.in/settings/password)",
+      {
+        parse_mode: "Markdown"
+      }
     );
     return;
   }
@@ -75,7 +90,11 @@ bot.onText(/\/login (.+)/, async (msg, match) => {
 
 bot.onText(/\/logout/, async (msg, match) => {
   const query = { chatId: msg.chat.id };
-  const update = { chatId: query.chatId, pinboardToken: null };
+  const update = {
+    chatId: query.chatId,
+    pinboardToken: null,
+    pinboardUsername: null
+  };
   await userFacade.findOneAndUpdate(query, update);
 
   bot.sendMessage(
