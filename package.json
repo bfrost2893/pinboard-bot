@@ -16,8 +16,10 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
+    "mongoose": "^4.12.3",
     "node-telegram-bot-api": "^0.28.0"
   },
   "devDependencies": {

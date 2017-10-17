@@ -7,5 +7,8 @@ export default {
     url: "https://api.pinboard.in/v1"
   },
   port: process.env.PORT || 8000,
-  host: "https://pinboard-bot.herokuapp.com"
+  host: "https://pinboard-bot.herokuapp.com",
+  mongo: {
+    url: process.env.MONGODB_URI
+  }
 };
