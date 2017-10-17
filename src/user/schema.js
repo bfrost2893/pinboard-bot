@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  pinboardApiToken: String
+  pinboardToken: String,
+  pinboardUsername: String
 });
 
 export default mongoose.model("User", UserSchema);

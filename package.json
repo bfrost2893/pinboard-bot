@@ -16,11 +16,13 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "mongoose": "^4.12.3",
-    "node-telegram-bot-api": "^0.28.0"
+    "node-telegram-bot-api": "^0.28.0",
+    "xml2js-es6-promise": "^1.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -12,7 +12,7 @@ class UserFacade {
 
   findOneAndUpdate(conditions, update) {
     return this.Schema
-      .findOneAndUpdate(conditions, update, { new: true, upsert: true })
+      .findOneAndUpdate(conditions, update, { upsert: true })
       .exec();
   }
 
