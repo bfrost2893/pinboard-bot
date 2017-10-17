@@ -47,7 +47,7 @@ bot.onText(/\/login (.+)/, async (msg, match) => {
   const pinboardToken = match[1];
   let pinboardUser = null;
 
-  const currentUser = await userFacade.findOne({ chatId: msg.chat.id });
+  const currentUser = await userFacade.findOne({ userId: msg.from.id });
   if (currentUser.pinboardToken) {
     bot.sendMessage(
       msg.chat.id,
@@ -78,8 +78,13 @@ bot.onText(/\/login (.+)/, async (msg, match) => {
   const token = (await xml2js(pinboardUser.data)).result;
   const pinboardUsername = pinboardToken.replace(":" + token, "");
 
-  const query = { chatId: msg.chat.id };
-  const update = { chatId: query.chatId, pinboardToken, pinboardUsername };
+  const query = { userId: msg.from.id };
+  const update = {
+    userId: msg.from.id,
+    chatId: query.chatId,
+    pinboardToken,
+    pinboardUsername
+  };
   await userFacade.findOneAndUpdate(query, update);
 
   bot.sendMessage(
@@ -89,9 +94,8 @@ bot.onText(/\/login (.+)/, async (msg, match) => {
 });
 
 bot.onText(/\/logout/, async (msg, match) => {
-  const query = { chatId: msg.chat.id };
+  const query = { userId: msg.from.id };
   const update = {
-    chatId: query.chatId,
     pinboardToken: null,
     pinboardUsername: null
   };
@@ -103,10 +107,15 @@ bot.onText(/\/logout/, async (msg, match) => {
   );
 });
 
+bot.onText(/\/ping/, msg => {
+  bot.sendMessage(msg.chat.id, "pong");
+});
+
 // Just to ping!
-// bot.on("message", msg => {
-//   bot.sendMessage(msg.chat.id, "I am alive!");
-//   const query = { chatId: msg.chat.id };
-//   const update = query;
-//   userFacade.findOneAndUpdate(query, update);
-// });
+bot.on("message", msg => {
+  console.log("hi", msg);
+  //   bot.sendMessage(msg.chat.id, "I am alive!");
+  //   const query = { chatId: msg.chat.id };
+  //   const update = query;
+  //   userFacade.findOneAndUpdate(query, update);
+});
