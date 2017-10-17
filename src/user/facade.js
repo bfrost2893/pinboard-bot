@@ -17,13 +17,11 @@ class UserFacade {
   }
 
   findOne(...query) {
-    console.log("query", query);
     return this.Schema.findOne(...query).exec();
   }
 
   async findOrCreate({ chatId }) {
     const user = await this.findOne({ chatId });
-    console.log("user", user);
     if (!user) {
       return this.create({ chatId });
     }

@@ -5,6 +5,7 @@ import TelegramBot from "node-telegram-bot-api";
 import mongoose from "mongoose";
 import axios from "axios";
 import xml2js from "xml2js-es6-promise";
+import { find } from "lodash";
 import config from "./config";
 import userFacade from "./user/facade";
 
@@ -81,7 +82,6 @@ bot.onText(/\/login (.+)/, async (msg, match) => {
   const query = { userId: msg.from.id };
   const update = {
     userId: msg.from.id,
-    chatId: query.chatId,
     pinboardToken,
     pinboardUsername
   };
@@ -111,11 +111,37 @@ bot.onText(/\/ping/, msg => {
   bot.sendMessage(msg.chat.id, "pong");
 });
 
-// Just to ping!
-bot.on("message", msg => {
-  console.log("hi", msg);
-  //   bot.sendMessage(msg.chat.id, "I am alive!");
-  //   const query = { chatId: msg.chat.id };
-  //   const update = query;
-  //   userFacade.findOneAndUpdate(query, update);
+bot.onText(/@pin_board_bot/, async msg => {
+  const urlEntity = find(msg.entities, { type: "url" });
+  if (!urlEntity) {
+    bot.sendMessage(msg.chat.id, "No URL found.");
+    return;
+  }
+
+  const currentUser = await userFacade.findOne({ userId: msg.from.id });
+  const url = msg.text.match(/\bhttps?:\/\/\S+/gi)[0];
+  const tags = msg.text.match(/ tags=([[-\w\s]+(?:,[-\w\s]*)*)/);
+  const toread = / toread/.test(msg.text) ? "yes" : "no";
+  const shared = / shared/.test(msg.text) ? "yes" : "no";
+  const website = await axios.get(url);
+  const description = website.data.match(/<title>(.*?)<\/title>/)[1];
+
+  try {
+    const res = await axios.get(
+      `${config.pinboard
+        .url}/posts/add/?auth_token=${currentUser.pinboardToken}&url=${url}&description=${description}&tags=${tags
+        ? tags[1]
+        : ""}&toread${toread}&shared=${shared}`
+    );
+  } catch (err) {
+    console.log("err man", err);
+    bot.sendMessage(msg.chat.id, "Error posting link to Pinboard. Try again.");
+    return;
+  }
+
+  bot.sendMessage(
+    msg.chat.id,
+    `[${description}](${url}) added to ${currentUser.pinboardUsername}'s pinboard!`,
+    { parse_mode: "Markdown" }
+  );
 });
