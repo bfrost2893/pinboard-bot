@@ -145,3 +145,14 @@ bot.onText(/@pin_board_bot/, async msg => {
     { parse_mode: "Markdown" }
   );
 });
+
+bot.onText(/\/help/, msg => {
+  bot.sendMessage(
+    msg.chat.id,
+    `Welcome to Pinbot!
+  To get started, /login to Pinboard by running /login [<api token>](https://pinboard.in/settings/password).
+  To logout at anytime, just run /logout.
+  To add a link, just type @pin_board_me and pass a valid link. You can also specify additional options just as \`shared\`, \`toread\`, and \`tags\`.
+  Example: @pin_board_bot https://www.nytimes.com/ toread shared tags=news,lib`
+  );
+});
